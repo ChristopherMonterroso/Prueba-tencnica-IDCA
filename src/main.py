@@ -23,13 +23,24 @@ def add_persona():
     for field in required_fields:
         if field not in data:
             return jsonify({'error': f'Falta el campo {field} en el JSON'}), 400
+
+    nueva_persona = Persona(
+        nombres=data['Nombres'],
+        apellidos=data['Apellidos'],
+        fecha_nacimiento=data['FechaNacimiento'],
+        genero=data['Genero'],
+        direccion=data['Direccion'],
+        estado_civil=data['EstadoCivil'],
+        dpi=data['DPI']
+    )
+
     try:
         cursor = db.cursor()
         cursor.execute(
             "INSERT INTO Personas (Nombres, Apellidos, FechaNacimiento, Genero, Direccion, EstadoCivil, DPI) "
             "VALUES (?, ?, ?, ?, ?, ?, ?)",
-            data['Nombres'], data['Apellidos'], data['FechaNacimiento'], data['Genero'],
-            data['Direccion'], data['EstadoCivil'], data['DPI']
+            nueva_persona.nombres, nueva_persona.apellidos, nueva_persona.fecha_nacimiento,
+            nueva_persona.genero, nueva_persona.direccion, nueva_persona.estado_civil, nueva_persona.dpi
         )
 
         db.commit()
@@ -37,6 +48,7 @@ def add_persona():
         return jsonify({'message': 'Persona agregada correctamente'}), 201
     except pyodbc.IntegrityError as e:
         return jsonify({'error': f'Error de integridad: {e}'}), 400
+
 
 @app.route('/api/personas', methods=['GET'])
 def get_personas():
